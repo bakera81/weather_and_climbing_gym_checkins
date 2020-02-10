@@ -8,10 +8,9 @@ import sys
 import psycopg2
 from tabulate import tabulate
 from datetime import timedelta
-sys.path.append('/home/mike/dsi/public-repos/climbing_gym_checkins')
+sys.path.append('/home/mike/dsi/public-repos/weather_and_climbing_gym_checkins')
 from src.paths import data_path, prj_path, img_path
 from src.funcs import conditions_dict, resample, parse_datetime
-
 from src.decomp import Decomp
 from src.hyp_test import run_hyp_tests
 from src.sql_exec import SqlExec
@@ -118,9 +117,6 @@ def weather_trend_plot(ax, df_counts_res, df_weather_res, title, weather_col='te
     ax_c.set_yticklabels([], [])
     ax.plot(df_weather_res[weather_col], linestyle='--', linewidth=2, label=w_label, color=w_color)
     ax.set_ylabel(w_ylabel)
-
-    for ax in axes:
-        ax.set_yticks([], [])
     
     plt.grid(b=None)
 

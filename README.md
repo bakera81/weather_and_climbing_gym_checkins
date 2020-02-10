@@ -2,14 +2,14 @@
 
 # Table of Contents
 
-1. [Background & Motivaiton](#-Background-&-Motivation)
-2. [Validity of Prediction Model](#-Validity-of-Prediction-Model)
-3. [The Data](#-The-Data)
-4. [Exploratory Data Analysis](#-Exploratory-Data-Analysis)
-5. [Decomposition](#-Decomposition)
-6. [Hypothesis Testing](#-Hypothesis-Testing)
+1. [Background & Motivaiton](#background-&-motivation)
+2. [Validity of Prediction Model](#validity-of-prediction-model)
+3. [The Data](#the-data)
+4. [Exploratory Data Analysis](#exploratory-data-analysis)
+5. [Decomposition](#decomposition)
+6. [Hypothesis Testing](#hypothesis-testing)
 
-## **Warning! This repository has been stripped of all numbers of the gym data and only shows trends to protect proprietary information. This repository is only to be used as a tool for the evaluation of the repository's owner. It is in no way a source of company information and should not be used for that purpose.**
+## **Warning! This repository has been stripped of all numbers of the gym data and only shows trends to protect proprietary information. This repository is only to be used as a tool for evaluation of the repository's owner. It is in no way a source of company information and should not be used for that purpose.**
 
 
 <p align="center">
