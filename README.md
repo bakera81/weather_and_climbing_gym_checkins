@@ -286,3 +286,5 @@ Its clear from above that different days of the week have different daily distri
 
 I did not have time to dive into the user tables that were created from the raw gym check-in data. It would be really interesting to find ways to catergorize users and predict their behavior. This could also lead to better estimates of required staff and space required for a specific type of user.
 
+
+
