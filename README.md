@@ -34,9 +34,11 @@ I'm a climber and am currently working in the climbing industry. It is valuable 
 
 From my experience as an employee and member of a climbing gym, I have some ideas about possible correlations between external factors and gym use. I believe that weather has a significant effect on gym use. It seems that days with better weather have less check-ins compared to days with worse weather. If this is true it may be possible to accurately predict the number of people that will check-in to the gym on a given day or hour based on the weather and other trends in gym use.
 
+
 ## Purpose
 
 The purpose of this analysis is to determine the viability of an *hourly check-in prediction model*. The analysis will include a search for features and methods to use in a prediction model. It is important to get a general sense of user behavior and general trends in gym check-ins before comparing them to weather. This will allow for a better analysis of the effect of weather on gym check-ins and may present alternative features to use for the model.
+
 
 ## The Model
 
@@ -44,13 +46,18 @@ A prediction model could be used in 2 main ways:
 
 - One use of the model is to analyze macro scale effects on gym check-ins. The model could be trained on data over certain time periods with specific external variables. This could then be used to create a *what if* or counterfactual scenario to compare with real world data. For example, the model could be trained on check-in data before the addition of new gyms. This predicted check-in rate can be compared to the actual rate to estimate the effect of new gyms on the demand for a specific gym.
 
+
 - The model could be used to assist gym operators and managers with gym staffing, event planning, maintenance work, route setting schedules and any other gym functions that are set around gym occupancy.
+
 
 Limitations of a model that is closely related to weather will be the accuracy and reliability of the weather forecast. In order to make the model more useful it will be necessary to create 2 main parts.
 
+
 1. A short term prediction of hourly check-ins that will be more accurate and assist in last minute planning and staffing changes.
 
+
 2. A long term prediction of checkins to assist in setting up staff schedules, event planning, setting schedules, predicting larger trends.
+
 
 Analyzing counterfactuals will use histroical weather data and will not rely on the accuracy of the forecast.
 
@@ -62,6 +69,7 @@ To answer these questions and check the validity of such a prediction model I ne
 <p align="center">
     <img src="images/et_logo.png" alt="raw data"></img>
 </p>
+
 
 ## Check-in Data
 
@@ -104,6 +112,7 @@ Older gyms had multiple .xlsx files spanning multiple years. Below is an example
 
 In order to compare the gym check-in data with the weather, I need to have historical data for the area around the gyms that has been recorded hourly. There is a National Renewable Energy Laboratory (NREL) Solar Radiation Research Laboratory (SRRL) in Golden. The facility has been collecting and storing hourly weather data since 1981. This data is all available online which can be downloaded as csv files. The station is about 2 miles from the Golden gym and about 11 miles from the Englewood gym. Most of the sensors that are available are for solar data but there is a multitude of sensors that are specifically weather that seems pertinent to whether a person would decide to go to the gym.
 
+
 The columns of the raw data are: <br>
 
 |COLUMN|DESCRIPTION|
@@ -128,9 +137,11 @@ Below is a visual representation of the data pipeline:
 
 All the data is cleaned in the SQL scripts. There were a few noteworthy cleaning steps:
 
+
 ### Duplicate Check-ins
 
 Throughout the data there were duplicate check-ins. Either a person checked in twice within the same hour or the system registered their check-in twice. There were also check-ins from the same person on the same day. This could mean that they checked in, left, and came back later. Counting both check-ins is reasonable when they are a significant time apart i.e. 6 am and 5 pm. But there were check-ins that were only a few hours apart. It is unlikely that a person checked in, used the gym, left, came back and checked back in within this short time frame. Therefore I only kept the first check-in for a given person  that checked in multiple times within 4 hours using a SQL CROSS JOIN.
+
 
 | GUID                                 | Date       |   Checkin Hour |
 |:-------------------------------------|:-----------|---------------:|
@@ -148,9 +159,11 @@ In order to get proper values when aggregating, it is important to only include 
 
 I only include days that the `tot_checkins > 50` in order to account for days the gym is closed like Christmas or Thanksgiving.
 
+
 ### Weather
 
 Cleaning the weather data required some unit conversion, null value replacement and interpolation due to the way the data is recorded and erratic sensor behavior. Most notably, the snow depth data had some difficult to detect spikes that required analyzing the difference of the time series data. A more step by step process can be seen in the [cleaning.ipynb](cleaning.ipynb).
+
 
 # Exploratory Data Analysis
 
@@ -160,7 +173,9 @@ The first step is to plot the aggregated data to get the big picture. I resample
 
 > Note: This is an aggregated sum of *check-ins per week*. This gives a good sense how many total people are coming into the gym. Weeks with less hours open will have lower overall counts i.e. Christmas.
 
+
 There appears to be a strong seasonality component to gym check-ins with low numbers in the summer and high numbers in the winter. To further explore this I plotted check-ins by month.
+
 
 <table>
     <tr>
@@ -177,6 +192,7 @@ There appears to be a strong seasonality component to gym check-ins with low num
 
 Now we have an overall sense of the data over longer periods of time. It's also necessary to look at the distribution of check-ins over a given day. This will allow us to compare similar days in order to see the effect of weather on check-ins.
 
+
 <table>
     <tr>
         <td>
@@ -190,11 +206,13 @@ Now we have an overall sense of the data over longer periods of time. It's also 
 
 Unsurprisingly, its clear that weekends and weekdays have very different check-in distributions. The weekdays are more concentrated after work and the weekends are more spread out throughout the day. It appears that Friday does not fit into either category particularly well and has a distribution somewhere between the Monday - Thursday group and the Saturday, Sunday group.
 
+
 # Decomposition
 
 The next step is to decompose the data into *trend* and *seasonality* components. This will allow us to to compare the effect of weather on a day in 2019 to one in 2014 by removing the year over year trend to evaluate the relative daily check-ins.
 
 I used several methods to estimate the *trend* component of the data. The two methods that proved to be the best were a simple **linear fit** and an **annual average**. The results of the two methods are below.
+
 
 <table>
     <tr>
@@ -209,6 +227,7 @@ I used several methods to estimate the *trend* component of the data. The two me
 
 While the results are similar I think the **annual average** method captures the trend of Golden well while a simple **linear fit** seems appropriate for Englwood.
 
+
 The **annual average** captures the leveling off of check-ins at Golden when the Englewood gym opens. This leveling off is clearly shown in the *trend* component of the **annual average** after 2018 in the Golden decomposition graph.
 
 # Hypothesis Testing
@@ -221,21 +240,26 @@ From my domain knowledge as a user and employee of climbing gyms, I think that t
 2. Any amount of precipitation will *increase* gym use
 3. Any amount of snow will *increase* gym use
 
+
 These questions are set up in a way to provide 2 specific groups. Days that have bad weather and days that have good weather. This will give me two distributions to perform a hypothesis test. 
 
 <img src="images/weather_compare.png" alt="Golden vs Weather Plot"></img>
 > Note: The Y axis on the right is relative check-ins. The check-in data (red line) is the *seasonal* component of the check-in data and does not relate to actual check-in numbers.
 
+
 A quick glance at the Golden check-in data against the above weather parameters shows a strong correlation with temperature and possible correlations with precipitation and snow depth. Although the graphs appear to show correlations it is still necessary to perform a more rigorous test to ensure there is a significant difference between the good weather days and bad weather days distributions.
+
 
 ## Hypothesis Tests
 
 We will have a more rigourous statistical test and a better chance of finding the true effect of weather if we compare similar groups. From the EDA above I have determined the groups below:
 
+
 1. Compare Monday - Thurday
 2. Compare weekends
 
 I am interested in whether the check-ins are higher or lower so a two-tailed T-test is appropriate for this situation. Each distribution is a series of daily check-ins. I feel comfortable assuming that these are independent and identically distributed because they are taken from a fairly large sample of days among similar groups. Performing these 6 tests for each gym will total in 12 hypothesis tests. A conservative correction for the number of tests is the Bonferoni correction. In order to reject the null hypothesis the p-value will need to be less than the corrected value below:
+
 
 Single test significance level:
 α = 0.05
@@ -247,6 +271,7 @@ Bonferoni corrected significance level:
 
 Below are the distributions from the Golden gym for days that the max temperature was *good* compared with the distributions that the temperature was *bad*. Area under the curve to the right indicates more days with more check-ins while area the left indicates more days with less check-ins. 
 
+
 <img src="images/gol_hyp_2_plots.png" alt="gol temp hyp test"></img>
 
 ### Golden Hypothesis Test Results
@@ -255,6 +280,7 @@ Below are the distributions from the Golden gym for days that the max temperatur
 | Max Temp < 50 OR Max Temp > 90 | XXX more checkins on bad weather days with a p value: < 0.001 | XXX more checkins on bad weather days with a p value: < 0.001 |
 | Rain | XXX more checkins on bad weather days with a p value: 0.001  | XXX more checkins on bad weather days with a p value: < 0.001 |
 | Snow on ground | XXX more checkins on bad weather days with a p value: < 0.001 | XXX more checkins on bad weather days with a p value: < 0.001 |
+
 
 ### Englewood Hypothesis Test Results
 |Bad Weather Condition | Weekends                                               | Weekdays                              |
@@ -267,7 +293,9 @@ Below are the distributions from the Golden gym for days that the max temperatur
 
 Looking at the results above shows that gym check-ins are affected by the weather. Most notably the temperature. On average XXX more people check-in to the Golden gym and XXX more people into the Englewood gym on the weekends when the weather outside is extreme. The effects from weather are larger on the weekends than on weekdays. This is most likely due to people choosing to be outside on a nice weekend than in the gym.
 
+
 The effect from snow depth seems to be the most significant. But I am concerned that this may be the effect of snow depth combined with the effects from temperature. It only snows when the temperature is low and less people check into the gym when it is cold. This means the features are dependent and the effects should be adjusted for.
+
 
 # Future Work
 
@@ -278,11 +306,15 @@ More analysis should be done to investigate these findings with more detail and 
 - Temperature for analyzing the effect of snow
 - Holidays for all weather conditions
 
+
 ## Daily Distribution Analysis
 
 Its clear from above that different days of the week have different daily distributions. It may be useful to analyze the daily distributions more deeply in order to predict a daily distribution for a given day. This could be used with a daily check-in prediction to estimate a daily distribution.
 
+
 ## Catergorizing Users
 
 I did not have time to dive into the user tables that were created from the raw gym check-in data. It would be really interesting to find ways to catergorize users and predict their behavior. This could also lead to better estimates of required staff and space required for a specific type of user.
+
+
 
